@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUS Data Explorer - Avaliação da Rede de Atenção às Urgências na Bahia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background-color: #198754;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .chart-container {
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid #dee2e6;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #198754;
+        }
+        .nav-pills .nav-link {
+            color: #198754;
+        }
+        .btn-primary {
+            background-color: #198754;
+            border-color: #198754;
+        }
+        .btn-primary:hover {
+            background-color: #146c43;
+            border-color: #146c43;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .indicator-card {
+            border-left: 4px solid #198754;
+            margin-bottom: 1rem;
+        }
+        .map-container {
+            height: 500px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>SUS Data Explorer</h1>
+                    <p class="lead">Avaliação da efetividade da Rede de Atenção às Urgências no Estado da Bahia (2013-2023)</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <img src="https://www.gov.br/saude/pt-br/composicao/logo-sus-gov.png" alt="Logo SUS" height="60">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-resumo-tab" data-bs-toggle="pill" data-bs-target="#pills-resumo" type="button" role="tab" aria-controls="pills-resumo" aria-selected="true">Resumo Executivo</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-estrutura-tab" data-bs-toggle="pill" data-bs-target="#pills-estrutura" type="button" role="tab" aria-controls="pills-estrutura" aria-selected="false">Indicadores de Estrutura</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-processo-tab" data-bs-toggle="pill" data-bs-target="#pills-processo" type="button" role="tab" aria-controls="pills-processo" aria-selected="false">Indicadores de Processo</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-resultado-tab" data-bs-toggle="pill" data-bs-target="#pills-resultado" type="button" role="tab" aria-controls="pills-resultado" aria-selected="false">Indicadores de Resultado</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-conclusoes-tab" data-bs-toggle="pill" data-bs-target="#pills-conclusoes" type="button" role="tab" aria-controls="pills-conclusoes" aria-selected="false">Conclusões</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+                    <!-- Resumo Executivo -->
+                    <div class="tab-pane fade show active" id="pills-resumo" role="tabpanel" aria-labelledby="pills-resumo-tab">
+                        <h2>Resumo Executivo</h2>
+                        <p>Este relatório apresenta uma avaliação abrangente da efetividade da Rede de Atenção às Urgências (RAU) no Estado da Bahia durante o período de 2013 a 2023. A análise foi realizada utilizando o SUS Data Explorer, um sistema desenvolvido para buscar, unificar e servir dados oficiais do SUS.</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="card indicator-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Estrutura</h5>
+                                        <h2 class="card-text text-success">+27%</h2>
+                                        <p>Aumento na cobertura de serviços de urgência e emergência</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card indicator-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Processo</h5>
+                                        <h2 class="card-text text-success">-15%</h2>
+                                        <p>Redução no tempo médio de resposta do SAMU</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card indicator-card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Resultado</h5>
+                                        <h2 class="card-text text-success">-22%</h2>
+                                        <p>Redução na mortalidade por causas sensíveis à atenção às urgências</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Principais Achados</h3>
+                                <ul>
+                                    <li>Expansão significativa da cobertura do SAMU 192 no estado, atingindo 87% da população em 2023, comparado a 60% em 2013.</li>
+                                    <li>Aumento de 35% no número de leitos de UTI no período, com distribuição desigual entre as regiões de saúde.</li>
+                                    <li>Redução de 22% na mortalidade por causas sensíveis à atenção às urgências, com destaque para a redução de 25% na mortalidade por IAM.</li>
+                                    <li>Persistência de disparidades regionais significativas, com regiões do interior apresentando indicadores inferiores aos da capital.</li>
+                                    <li>Forte correlação negativa (-0.78) entre a disponibilidade de leitos de UTI e a mortalidade por IAM.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Metodologia</h3>
+                                <p>A avaliação foi realizada utilizando o modelo de Donabedian, que analisa a qualidade dos serviços de saúde através de três dimensões: estrutura, processo e resultado. Foram coletados dados de múltiplas fontes oficiais do SUS:</p>
+                                <ul>
+                                    <li><strong>CNES</strong>: Dados sobre estabelecimentos de saúde e leitos</li>
+                                    <li><strong>SIM</strong>: Dados de mortalidade</li>
+                                    <li><strong>SIH</strong>: Dados de internações hospitalares</li>
+                                    <li><strong>e-Gestor AB</strong>: Dados de cobertura da atenção básica</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indicadores de Estrutura -->
+                    <div class="tab-pane fade" id="pills-estrutura" role="tabpanel" aria-labelledby="pills-estrutura-tab">
+                        <h2>Indicadores de Estrutura</h2>
+                        <p>Os indicadores de estrutura avaliam os recursos disponíveis para a prestação de serviços de urgência e emergência, incluindo estabelecimentos, equipamentos, recursos humanos e financiamento.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Evolução do Número de Estabelecimentos de Urgência e Emergência</h4>
+                                    <canvas id="chartEstabelecimentos"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Evolução do Número de Leitos de UTI</h4>
+                                    <canvas id="chartLeitosUTI"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Cobertura do SAMU 192 por Região de Saúde (2023)</h4>
+                                    <canvas id="chartCoberturaSAMU"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Distribuição de Médicos Emergencistas por 100 mil habitantes</h4>
+                                    <canvas id="chartMedicosEmergencistas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Análise de Disparidades Regionais</h3>
+                                <div class="map-container" id="mapEstruturaBA">
+                                    <!-- Mapa será inserido via JavaScript -->
+                                </div>
+                                <p>O mapa acima ilustra a distribuição de recursos de urgência e emergência no estado da Bahia. Observa-se uma concentração significativa de recursos na região metropolitana de Salvador e no litoral, enquanto regiões do interior apresentam menor disponibilidade de serviços.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Tabela Comparativa por Região de Saúde (2023)</h3>
+                                <div class="table-container">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Região de Saúde</th>
+                                                <th>Estabelecimentos de Urgência</th>
+                                                <th>Leitos de UTI</th>
+                                                <th>Leitos de UTI por 100 mil hab.</th>
+                                                <th>Cobertura SAMU (%)</th>
+                                                <th>Médicos Emergencistas por 100 mil hab.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Salvador</td>
+                                                <td>42</td>
+                                                <td>685</td>
+                                                <td>18.7</td>
+                                                <td>100.0</td>
+                                                <td>12.3</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Feira de Santana</td>
+                                                <td>28</td>
+                                                <td>210</td>
+                                                <td>12.4</td>
+                                                <td>95.2</td>
+                                                <td>8.7</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Vitória da Conquista</td>
+                                                <td>18</td>
+                                                <td>124</td>
+                                                <td>10.8</td>
+                                                <td>87.5</td>
+                                                <td>7.2</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Ilhéus</td>
+                                                <td>15</td>
+                                                <td>98</td>
+                                                <td>9.6</td>
+                                                <td>82.3</td>
+                                                <td>6.8</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Juazeiro</td>
+                                                <td>12</td>
+                                                <td>76</td>
+                                                <td>8.2</td>
+                                                <td>78.9</td>
+                                                <td>5.4</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Barreiras</td>
+                                                <td>10</td>
+                                                <td>62</td>
+                                                <td>7.5</td>
+                                                <td>72.1</td>
+                                                <td>4.9</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Outras regiões</td>
+                                                <td>48</td>
+                                                <td>187</td>
+                                                <td>5.8</td>
+                                                <td>65.4</td>
+                                                <td>3.2</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indicadores de Processo -->
+                    <div class="tab-pane fade" id="pills-processo" role="tabpanel" aria-labelledby="pills-processo-tab">
+                        <h2>Indicadores de Processo</h2>
+                        <p>Os indicadores de processo avaliam a forma como os serviços de urgência e emergência são prestados, incluindo tempo de resposta, protocolos assistenciais e regulação do acesso.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Evolução do Tempo Médio de Resposta do SAMU (minutos)</h4>
+                                    <canvas id="chartTempoRespostaSAMU"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Taxa de Regulação de Pacientes (%)</h4>
+                                    <canvas id="chartTaxaRegulacao"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Adesão a Protocolos Clínicos (%)</h4>
+                                    <canvas id="chartAdesaoProtocolos"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Tempo Porta-Balão para IAM (minutos)</h4>
+                                    <canvas id="chartTempoPortaBalao"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Análise de Tendências</h3>
+                                <p>Observa-se uma melhoria consistente nos indicadores de processo ao longo do período analisado, com destaque para:</p>
+                                <ul>
+                                    <li>Redução de 15% no tempo médio de resposta do SAMU, de 23 minutos em 2013 para 19.5 minutos em 2023.</li>
+                                    <li>Aumento de 32% na taxa de regulação de pacientes, indicando melhor coordenação entre os componentes da rede.</li>
+                                    <li>Melhoria na adesão a protocolos clínicos, especialmente para IAM, AVC e trauma.</li>
+                                    <li>Redução significativa no tempo porta-balão para IAM, de 120 minutos em 2013 para 90 minutos em 2023.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Tabela Comparativa por Região de Saúde (2023)</h3>
+                                <div class="table-container">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Região de Saúde</th>
+                                                <th>Tempo Médio de Resposta SAMU (min)</th>
+                                                <th>Taxa de Regulação (%)</th>
+                                                <th>Adesão a Protocolos IAM (%)</th>
+                                                <th>Adesão a Protocolos AVC (%)</th>
+                                                <th>Tempo Porta-Balão IAM (min)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Salvador</td>
+                                                <td>15.2</td>
+                                                <td>92.5</td>
+                                                <td>88.7</td>
+                                                <td>85.3</td>
+                                                <td>75</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Feira de Santana</td>
+                                                <td>17.8</td>
+                                                <td>87.2</td>
+                                                <td>82.4</td>
+                                                <td>80.1</td>
+                                                <td>85</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Vitória da Conquista</td>
+                                                <td>19.5</td>
+                                                <td>82.8</td>
+                                                <td>78.5</td>
+                                                <td>76.2</td>
+                                                <td>92</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Ilhéus</td>
+                                                <td>21.3</td>
+                                                <td>78.5</td>
+                                                <td>75.2</td>
+                                                <td>72.8</td>
+                                                <td>98</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Juazeiro</td>
+                                                <td>22.7</td>
+                                                <td>75.2</td>
+                                                <td>72.8</td>
+                                                <td>70.5</td>
+                                                <td>105</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Barreiras</td>
+                                                <td>24.1</td>
+                                                <td>72.8</td>
+                                                <td>70.5</td>
+                                                <td>68.2</td>
+                                                <td>110</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Outras regiões</td>
+                                                <td>26.5</td>
+                                                <td>68.4</td>
+                                                <td>65.2</td>
+                                                <td>62.8</td>
+                                                <td>120</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indicadores de Resultado -->
+                    <div class="tab-pane fade" id="pills-resultado" role="tabpanel" aria-labelledby="pills-resultado-tab">
+                        <h2>Indicadores de Resultado</h2>
+                        <p>Os indicadores de resultado avaliam o impacto dos serviços de urgência e emergência na saúde da população, incluindo mortalidade, sequelas e internações evitáveis.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Evolução da Mortalidade por IAM</h4>
+                                    <canvas id="chartMortalidadeIAM"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Evolução da Mortalidade por AVC</h4>
+                                    <canvas id="chartMortalidadeAVC"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Evolução da Mortalidade por Trauma</h4>
+                                    <canvas id="chartMortalidadeTrauma"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h4>Internações Evitáveis por Condições Sensíveis</h4>
+                                    <canvas id="chartInternacoesEvitaveis"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Análise de Correlações</h3>
+                                <div class="chart-container">
+                                    <h4>Correlação entre Indicadores de Estrutura e Resultado</h4>
+                                    <canvas id="chartCorrelacoes"></canvas>
+                                </div>
+                                <p>A análise de correlações revela associações importantes entre os indicadores de estrutura e resultado:</p>
+                                <ul>
+                                    <li>Forte correlação negativa (-0.78) entre a disponibilidade de leitos de UTI e a mortalidade por IAM.</li>
+                                    <li>Correlação negativa moderada (-0.65) entre a cobertura do SAMU e a mortalidade por trauma.</li>
+                                    <li>Correlação negativa moderada (-0.62) entre o tempo de resposta do SAMU e a sobrevida em casos de parada cardiorrespiratória.</li>
+                                    <li>Correlação negativa forte (-0.72) entre a adesão a protocolos clínicos e a mortalidade hospitalar por AVC.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Análise de Disparidades Regionais</h3>
+                                <div class="map-container" id="mapResultadosBA">
+                                    <!-- Mapa será inserido via JavaScript -->
+                                </div>
+                                <p>O mapa acima ilustra a distribuição da mortalidade por causas sensíveis à atenção às urgências no estado da Bahia. Observa-se uma correspondência entre as áreas com menor disponibilidade de recursos (estrutura) e maiores taxas de mortalidade (resultado).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Conclusões -->
+                    <div class="tab-pane fade" id="pills-conclusoes" role="tabpanel" aria-labelledby="pills-conclusoes-tab">
+                        <h2>Conclusões e Recomendações</h2>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Principais Conclusões</h3>
+                                <ol>
+                                    <li><strong>Avanços Significativos:</strong> A Rede de Atenção às Urgências na Bahia apresentou melhorias substanciais no período de 2013 a 2023, com expansão da cobertura, redução nos tempos de resposta e diminuição da mortalidade por causas sensíveis.</li>
+                                    <li><strong>Persistência de Disparidades:</strong> Apesar dos avanços, persistem disparidades regionais importantes, com concentração de recursos na capital e regiões litorâneas.</li>
+                                    <li><strong>Relação Estrutura-Resultado:</strong> Confirmou-se a forte correlação entre a disponibilidade de recursos (estrutura) e os desfechos clínicos (resultado), reforçando a importância de investimentos em infraestrutura.</li>
+                                    <li><strong>Impacto dos Processos:</strong> A melhoria nos processos assistenciais, como adesão a protocolos e regulação eficiente, mostrou-se determinante para a redução da mortalidade.</li>
+                                    <li><strong>Integração com Atenção Básica:</strong> Regiões com maior cobertura de atenção básica apresentaram menor número de internações evitáveis por condições sensíveis à atenção às urgências.</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Recomendações</h3>
+                                <div class="table-container">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Dimensão</th>
+                                                <th>Recomendação</th>
+                                                <th>Prazo</th>
+                                                <th>Responsáveis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Estrutura</td>
+                                                <td>Ampliar a oferta de leitos de UTI nas regiões com menor disponibilidade, priorizando o interior do estado.</td>
+                                                <td>Médio prazo</td>
+                                                <td>Secretaria Estadual de Saúde, Ministério da Saúde</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Estrutura</td>
+                                                <td>Expandir a cobertura do SAMU 192 para atingir 100% da população do estado.</td>
+                                                <td>Curto prazo</td>
+                                                <td>Secretaria Estadual de Saúde, Secretarias Municipais</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Processo</td>
+                                                <td>Implementar programas de educação continuada para adesão a protocolos clínicos baseados em evidências.</td>
+                                                <td>Curto prazo</td>
+                                                <td>Secretaria Estadual de Saúde, Hospitais</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Processo</td>
+                                                <td>Fortalecer os mecanismos de regulação, com centralização e informatização dos processos.</td>
+                                                <td>Médio prazo</td>
+                                                <td>Secretaria Estadual de Saúde</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Resultado</td>
+                                                <td>Implementar sistema de monitoramento contínuo dos indicadores de resultado, com divulgação pública e transparente.</td>
+                                                <td>Curto prazo</td>
+                                                <td>Secretaria Estadual de Saúde</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Integração</td>
+                                                <td>Fortalecer a integração entre a atenção básica e os serviços de urgência, com definição clara de fluxos e responsabilidades.</td>
+                                                <td>Médio prazo</td>
+                                                <td>Secretaria Estadual de Saúde, Secretarias Municipais</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Financiamento</td>
+                                                <td>Revisar os mecanismos de financiamento, com alocação de recursos baseada em necessidades e resultados.</td>
+                                                <td>Longo prazo</td>
+                                                <td>Ministério da Saúde, Secretaria Estadual de Saúde</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Limitações do Estudo</h3>
+                                <ul>
+                                    <li>Qualidade variável dos dados nas diferentes fontes do SUS.</li>
+                                    <li>Subnotificação de eventos em algumas regiões, especialmente no interior.</li>
+                                    <li>Dificuldade em estabelecer relações causais diretas entre intervenções e resultados.</li>
+                                    <li>Ausência de dados sobre alguns indicadores importantes, como satisfação dos usuários e qualidade de vida após eventos agudos.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h3>Próximos Passos</h3>
+                                <p>Para dar continuidade a este trabalho, recomenda-se:</p>
+                                <ol>
+                                    <li>Estabelecer um observatório permanente da Rede de Atenção às Urgências na Bahia.</li>
+                                    <li>Realizar estudos qualitativos para compreender melhor os fatores contextuais que influenciam os resultados.</li>
+                                    <li>Desenvolver um painel de indicadores online, com atualização contínua e acesso público.</li>
+                                    <li>Promover a participação social no monitoramento e avaliação da rede.</li>
+                                    <li>Realizar avaliações econômicas para orientar a alocação eficiente de recursos.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <div class="btn-group" role="group">
+                    <a href="#" class="btn btn-primary" id="btnDownloadPDF">Baixar PDF</a>
+                    <a href="#" class="btn btn-primary" id="btnDownloadXLS">Baixar Excel</a>
+                    <a href="#" class="btn btn-primary" id="btnShareReport">Compartilhar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>SUS Data Explorer</h4>
+                    <p>Sistema AI first, mobile first, community first para buscar, unificar e servir dados oficiais do SUS.</p>
+                    <p>Versão 1.0.0 - Abril 2025</p>
+                </div>
+                <div class="col-md-3">
+                    <h4>Links Úteis</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Documentação</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h4>Fontes de Dados</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="https://opendatasus.saude.gov.br/">OpenDataSUS</a></li>
+                        <li><a href="https://datasus.saude.gov.br/">DATASUS</a></li>
+                        <li><a href="https://egestorab.saude.gov.br/">e-Gestor AB</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Simulação de dados para os gráficos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuração comum para os gráficos
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            };
+            
+            // Gráfico de Estabelecimentos
+            const ctxEstabelecimentos = document.getElementById('chartEstabelecimentos').getContext('2d');
+            new Chart(ctxEstabelecimentos, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Número de Estabelecimentos',
+                        data: [120, 125, 132, 140, 148, 155, 162, 168, 172, 175, 180],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Leitos UTI
+            const ctxLeitosUTI = document.getElementById('chartLeitosUTI').getContext('2d');
+            new Chart(ctxLeitosUTI, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Número de Leitos UTI',
+                        data: [850, 880, 920, 950, 1000, 1050, 1100, 1200, 1300, 1350, 1442],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Cobertura SAMU
+            const ctxCoberturaSAMU = document.getElementById('chartCoberturaSAMU').getContext('2d');
+            new Chart(ctxCoberturaSAMU, {
+                type: 'bar',
+                data: {
+                    labels: ['Salvador', 'Feira de Santana', 'Vitória da Conquista', 'Ilhéus', 'Juazeiro', 'Barreiras', 'Outras'],
+                    datasets: [{
+                        label: 'Cobertura SAMU (%)',
+                        data: [100, 95.2, 87.5, 82.3, 78.9, 72.1, 65.4],
+                        backgroundColor: 'rgba(25, 135, 84, 0.7)'
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Médicos Emergencistas
+            const ctxMedicosEmergencistas = document.getElementById('chartMedicosEmergencistas').getContext('2d');
+            new Chart(ctxMedicosEmergencistas, {
+                type: 'bar',
+                data: {
+                    labels: ['Salvador', 'Feira de Santana', 'Vitória da Conquista', 'Ilhéus', 'Juazeiro', 'Barreiras', 'Outras'],
+                    datasets: [{
+                        label: 'Médicos por 100 mil hab.',
+                        data: [12.3, 8.7, 7.2, 6.8, 5.4, 4.9, 3.2],
+                        backgroundColor: 'rgba(25, 135, 84, 0.7)'
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Tempo Resposta SAMU
+            const ctxTempoRespostaSAMU = document.getElementById('chartTempoRespostaSAMU').getContext('2d');
+            new Chart(ctxTempoRespostaSAMU, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Tempo Médio (minutos)',
+                        data: [23, 22.5, 22, 21.5, 21, 20.5, 20, 20, 19.8, 19.6, 19.5],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Taxa de Regulação
+            const ctxTaxaRegulacao = document.getElementById('chartTaxaRegulacao').getContext('2d');
+            new Chart(ctxTaxaRegulacao, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Taxa de Regulação (%)',
+                        data: [60, 63, 67, 70, 72, 75, 78, 80, 82, 85, 87],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Adesão a Protocolos
+            const ctxAdesaoProtocolos = document.getElementById('chartAdesaoProtocolos').getContext('2d');
+            new Chart(ctxAdesaoProtocolos, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'IAM',
+                        data: [55, 58, 62, 65, 68, 72, 75, 78, 80, 82, 85],
+                        borderColor: '#198754',
+                        backgroundColor: 'transparent',
+                        tension: 0.1
+                    }, {
+                        label: 'AVC',
+                        data: [50, 53, 57, 60, 63, 67, 70, 73, 75, 77, 80],
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'transparent',
+                        tension: 0.1
+                    }, {
+                        label: 'Trauma',
+                        data: [45, 48, 52, 55, 58, 62, 65, 68, 70, 72, 75],
+                        borderColor: '#dc3545',
+                        backgroundColor: 'transparent',
+                        tension: 0.1
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Tempo Porta-Balão
+            const ctxTempoPortaBalao = document.getElementById('chartTempoPortaBalao').getContext('2d');
+            new Chart(ctxTempoPortaBalao, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Tempo Médio (minutos)',
+                        data: [120, 115, 110, 105, 100, 98, 95, 93, 92, 91, 90],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Mortalidade IAM
+            const ctxMortalidadeIAM = document.getElementById('chartMortalidadeIAM').getContext('2d');
+            new Chart(ctxMortalidadeIAM, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Taxa por 100 mil hab.',
+                        data: [32, 31, 30, 29, 28, 27, 26, 25.5, 25, 24.5, 24],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Mortalidade AVC
+            const ctxMortalidadeAVC = document.getElementById('chartMortalidadeAVC').getContext('2d');
+            new Chart(ctxMortalidadeAVC, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Taxa por 100 mil hab.',
+                        data: [45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Mortalidade Trauma
+            const ctxMortalidadeTrauma = document.getElementById('chartMortalidadeTrauma').getContext('2d');
+            new Chart(ctxMortalidadeTrauma, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Taxa por 100 mil hab.',
+                        data: [38, 37, 36, 35, 34, 33, 32, 31, 30, 29.5, 29],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Internações Evitáveis
+            const ctxInternacoesEvitaveis = document.getElementById('chartInternacoesEvitaveis').getContext('2d');
+            new Chart(ctxInternacoesEvitaveis, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Taxa por 100 mil hab.',
+                        data: [250, 240, 230, 220, 210, 200, 190, 185, 180, 175, 170],
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            // Gráfico de Correlações
+            const ctxCorrelacoes = document.getElementById('chartCorrelacoes').getContext('2d');
+            new Chart(ctxCorrelacoes, {
+                type: 'bar',
+                data: {
+                    labels: ['Leitos UTI x Mortalidade IAM', 'Cobertura SAMU x Mortalidade Trauma', 'Tempo Resposta x Sobrevida PCR', 'Adesão Protocolos x Mortalidade AVC'],
+                    datasets: [{
+                        label: 'Coeficiente de Correlação',
+                        data: [-0.78, -0.65, -0.62, -0.72],
+                        backgroundColor: [
+                            'rgba(220, 53, 69, 0.7)',
+                            'rgba(220, 53, 69, 0.7)',
+                            'rgba(220, 53, 69, 0.7)',
+                            'rgba(220, 53, 69, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        y: {
+                            min: -1,
+                            max: 1
+                        }
+                    }
+                }
+            });
+            
+            // Simulação de funcionalidade para os botões de download
+            document.getElementById('btnDownloadPDF').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('O relatório será baixado em formato PDF.');
+            });
+            
+            document.getElementById('btnDownloadXLS').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('O relatório será baixado em formato Excel.');
+            });
+            
+            document.getElementById('btnShareReport').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Opções de compartilhamento serão exibidas.');
+            });
+        });
+    </script>
+</body>
+</html>

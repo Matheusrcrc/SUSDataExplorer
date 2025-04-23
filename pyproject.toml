@@ -1,0 +1,28 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests that require external resources",
+    "api: marks tests that test the API",
+    "connectors: marks tests that test the connectors",
+    "notebook: marks tests that test the notebooks",
+]
+
+[tool.coverage.run]
+source = ["connectors", "api", "mobile"]
+omit = ["tests/*", "**/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+]
+fail_under = 90
+show_missing = true
