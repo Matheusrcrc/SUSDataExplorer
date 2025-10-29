@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SUS Data Explorer - Sistema AI first, mobile first, community first para explorar dados do SUS">
+    <title>SUS Data Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 0;
+            color: white;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s 0.2s both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 1s 0.4s both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Main Content */
+        main {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            margin-top: 2rem;
+        }
+
+        section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #667eea;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Data Sources */
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .source-card {
+            padding: 2rem;
+            text-align: center;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .source-card:hover {
+            border-color: #667eea;
+        }
+
+        .source-card h4 {
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            color: #667eea;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+
+        /* Footer */
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #667eea;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">🏥 SUS Data Explorer</div>
+                <ul class="nav-links">
+                    <li><a href="#features">Funcionalidades</a></li>
+                    <li><a href="#sources">Fontes</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="https://github.com">GitHub</a></li>
+                </ul>
+            </nav>
+
+            <div class="hero">
+                <h1>Explore Dados do SUS</h1>
+                <p>Sistema AI first, mobile first, community first para buscar, unificar e servir dados oficiais do SUS</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary" id="streamlit-link">🚀 Acessar Aplicação</a>
+                    <a href="https://github.com" class="btn btn-secondary">📖 Documentação</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Funcionalidades</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Múltiplas Fontes</h3>
+                        <p>Acesso integrado a CKAN, DEMAS, DATASUS TABNET e e-Gestor AB</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3>Busca Inteligente</h3>
+                        <p>Filtre dados por região, município e período com facilidade</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Visualizações</h3>
+                        <p>Gráficos interativos e dashboards personalizáveis</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📥</div>
+                        <h3>Exportação</h3>
+                        <p>Exporte dados em CSV, JSON, Excel e Parquet</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Performance</h3>
+                        <p>Cache inteligente e processamento otimizado</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>Open Source</h3>
+                        <p>Código aberto, documentado e colaborativo</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="container">
+                <h2 class="section-title" style="color: white;">Números do Projeto</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>4</h3>
+                        <p>Fontes Integradas</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>100+</h3>
+                        <p>Datasets Disponíveis</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>10</h3>
+                        <p>Anos de Cobertura</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>100%</h3>
+                        <p>Open Source</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sources">
+            <div class="container">
+                <h2 class="section-title">Fontes de Dados</h2>
+                <div class="sources-grid">
+                    <div class="source-card">
+                        <div class="feature-icon">🗃️</div>
+                        <h4>CKAN OpenDataSUS</h4>
+                        <p>Datasets em CSV/Parquet via API CKAN oficial</p>
+                    </div>
+                    <div class="source-card">
+                        <div class="feature-icon">📋</div>
+                        <h4>DEMAS</h4>
+                        <p>Dados do Departamento de Monitoramento e Avaliação</p>
+                    </div>
+                    <div class="source-card">
+                        <div class="feature-icon">🏥</div>
+                        <h4>DATASUS TABNET</h4>
+                        <p>Dados do DATASUS via PySUS e TABNET</p>
+                    </div>
+                    <div class="source-card">
+                        <div class="feature-icon">⚕️</div>
+                        <h4>e-Gestor AB</h4>
+                        <p>Dados da Atenção Básica e indicadores</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2 class="section-title">Sobre o Projeto</h2>
+                <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                    <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                        O SUS Data Explorer é um sistema open-source que simplifica o acesso aos bancos públicos
+                        do SUS, gera insights reproduzíveis e permite evolução colaborativa.
+                    </p>
+                    <div style="text-align: left; margin-top: 3rem;">
+                        <h3 style="color: #667eea; margin-bottom: 1rem;">🎯 Pilares</h3>
+                        <ul style="list-style-position: inside; font-size: 1.1rem; line-height: 2;">
+                            <li><strong>AI First:</strong> Desenvolvimento assistido por IA</li>
+                            <li><strong>Mobile First:</strong> Interface responsiva e acessível</li>
+                            <li><strong>Community First:</strong> Open source com documentação completa</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Pronto para Começar?</h2>
+                <p>Explore dados do SUS de forma simples e interativa</p>
+                <a href="#" class="btn btn-primary" id="streamlit-link-2">🚀 Acessar Aplicação Agora</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <ul class="footer-links">
+                <li><a href="https://github.com">GitHub</a></li>
+                <li><a href="https://github.com">Documentação</a></li>
+                <li><a href="https://github.com">Contribuir</a></li>
+                <li><a href="https://github.com">Licença MIT</a></li>
+            </ul>
+            <p>&copy; 2024 SUS Data Explorer. Feito com ❤️ para melhorar o acesso a dados públicos de saúde no Brasil.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Atualizar links do Streamlit quando o app estiver no ar
+        // Substitua 'YOUR_STREAMLIT_URL' pela URL real do Streamlit Cloud
+        const streamlitUrl = 'https://your-app.streamlit.app'; // ATUALIZAR APÓS DEPLOY
+
+        document.getElementById('streamlit-link').href = streamlitUrl;
+        document.getElementById('streamlit-link-2').href = streamlitUrl;
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
