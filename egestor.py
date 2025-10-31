@@ -15,7 +15,7 @@ import re
 from bs4 import BeautifulSoup
 import io
 
-from .base import DataConnector
+from base import DataConnector
 
 logger = logging.getLogger(__name__)
 

@@ -2,11 +2,11 @@ import pytest
 import pandas as pd
 from unittest.mock import AsyncMock, patch, MagicMock
 
-from connectors.base import DataConnector
-from connectors.ckan import CkanConnector
-from connectors.demas import DemasConnector
-from connectors.tabnet import TabnetConnector
-from connectors.egestor import EGestorConnector
+from base import DataConnector
+from ckan import CkanConnector
+from demas import DemasConnector
+from tabnet import TabnetConnector
+from egestor import EGestorConnector
 
 # Testes para a classe base DataConnector
 class TestDataConnector:
@@ -56,21 +56,34 @@ class TestCkanConnector:
     async def test_list_datasets(self, connector):
         # Arrange
         mock_response = MagicMock()
-        mock_response.json.return_value = {
-            "success": True,
-            "result": ["dataset1", "dataset2"]
-        }
-        mock_response.raise_for_status = MagicMock()
-        connector.client.get = AsyncMock(return_value=mock_response)
+        # Mock da resposta para a lista de datasets
+        mock_list_response = MagicMock()
+        mock_list_response.json.return_value = {"success": True, "result": ["dataset1", "dataset2"]}
+        mock_list_response.raise_for_status = MagicMock()
+
+        # Mock das respostas para os detalhes dos datasets
+        mock_detail1_response = MagicMock()
+        mock_detail1_response.json.return_value = {"success": True, "result": {"id": "dataset1", "title": "Dataset 1", "notes": "", "resources": []}}
+        mock_detail1_response.raise_for_status = MagicMock()
+
+        mock_detail2_response = MagicMock()
+        mock_detail2_response.json.return_value = {"success": True, "result": {"id": "dataset2", "title": "Dataset 2", "notes": "", "resources": []}}
+        mock_detail2_response.raise_for_status = MagicMock()
+
+        connector.client.get = AsyncMock(side_effect=[
+            mock_list_response,
+            mock_detail1_response,
+            mock_detail2_response
+        ])
         
         # Act
         result = await connector.list_datasets()
         
         # Assert
-        connector.client.get.assert_called_once()
+        assert connector.client.get.call_count == 3
         assert len(result) == 2
-        assert "dataset1" in result
-        assert "dataset2" in result
+        assert result[0]["id"] == "dataset1"
+        assert result[1]["name"] == "Dataset 2"
     
     @pytest.mark.asyncio
     async def test_fetch_dataset_info(self, connector):
@@ -78,7 +91,7 @@ class TestCkanConnector:
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "success": True,
-            "result": {"id": "dataset1", "name": "Dataset 1"}
+            "result": {"id": "dataset1", "title": "Dataset 1", "notes": "Description 1", "resources": []}
         }
         mock_response.raise_for_status = MagicMock()
         connector.client.get = AsyncMock(return_value=mock_response)
@@ -309,6 +322,12 @@ class TestEGestorConnector:
     
     @pytest.mark.asyncio
     async def test_fetch_cobertura(self, connector):
+        # Arrange
+        mock_response = AsyncMock()
+        mock_response.return_value.raise_for_status = MagicMock()
+        mock_response.return_value.text = ""
+        connector.client.get = mock_response
+
         # Act
         result = await connector.fetch({"report": "cobertura", "state": "BA", "year": 2020})
         

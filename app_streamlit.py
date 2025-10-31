@@ -13,44 +13,10 @@ import json
 from typing import Dict, Any, List
 
 # Importar conectores
-try:
-    from ckan import CkanConnector
-    from demas import DemasConnector
-    from tabnet import TabnetConnector
-    from egestor import EGestorConnector
-except ImportError:
-    # Se não conseguir importar, criar classes mock para demo
-    class CkanConnector:
-        def schema(self):
-            return {"name": "CKAN", "description": "Conector CKAN"}
-        async def list_datasets(self):
-            return []
-        async def get_data(self, query):
-            return pd.DataFrame()
-
-    class DemasConnector:
-        def schema(self):
-            return {"name": "DEMAS", "description": "Conector DEMAS"}
-        async def list_datasets(self):
-            return []
-        async def get_data(self, query):
-            return pd.DataFrame()
-
-    class TabnetConnector:
-        def schema(self):
-            return {"name": "TABNET", "description": "Conector TABNET"}
-        async def list_datasets(self):
-            return []
-        async def get_data(self, query):
-            return pd.DataFrame()
-
-    class EGestorConnector:
-        def schema(self):
-            return {"name": "e-Gestor", "description": "Conector e-Gestor"}
-        async def list_datasets(self):
-            return []
-        async def get_data(self, query):
-            return pd.DataFrame()
+from ckan import CkanConnector
+from demas import DemasConnector
+from tabnet import TabnetConnector
+from egestor import EGestorConnector
 
 # Configuração da página
 st.set_page_config(
@@ -99,18 +65,18 @@ def run_async(coro):
     return loop.run_until_complete(coro)
 
 # Cache para conectores
-@st.cache_resource
 def get_connectors():
     """Inicializa e retorna os conectores de dados"""
-    return {
-        "CKAN OpenDataSUS": CkanConnector(),
-        "DEMAS": DemasConnector(),
-        "DATASUS TABNET": TabnetConnector(),
-        "e-Gestor AB": EGestorConnector()
-    }
+    if 'connectors' not in st.session_state:
+        st.session_state['connectors'] = {
+            "CKAN OpenDataSUS": CkanConnector(),
+            "DEMAS": DemasConnector(),
+            "DATASUS TABNET": TabnetConnector(),
+            "e-Gestor AB": EGestorConnector()
+        }
+    return st.session_state['connectors']
 
 # Cache para datasets
-@st.cache_data(ttl=3600)
 def load_datasets(source_name: str):
     """Carrega lista de datasets de uma fonte"""
     connectors = get_connectors()
@@ -259,22 +225,23 @@ elif page == "📊 Explorar Dados":
     # Formulário de consulta
     st.subheader("🔍 Parâmetros de Busca")
 
+    # Carregar e selecionar dataset
+    if 'datasets' not in st.session_state or st.session_state.get('current_source') != source:
+        st.session_state['datasets'] = load_datasets(source)
+        st.session_state['current_source'] = source
+
+    datasets = st.session_state['datasets']
+    if not datasets:
+        st.warning("Nenhum dataset disponível para esta fonte.")
+        st.stop()
+
+    dataset_options = {ds.get("name", ds.get("id")): ds.get("id") for ds in datasets}
+    selected_dataset_name = st.selectbox("Selecione o Dataset:", list(dataset_options.keys()))
+    selected_dataset_id = dataset_options[selected_dataset_name]
+
     col1, col2 = st.columns(2)
 
     with col1:
-        # Indicadores disponíveis por fonte
-        indicators_by_source = {
-            "CKAN OpenDataSUS": ["PNI - Vacinação", "SIM - Mortalidade", "SIH - Internações"],
-            "DEMAS": ["Leitos", "Estabelecimentos", "CNES"],
-            "DATASUS TABNET": ["Mortalidade", "Nascimentos", "Doenças"],
-            "e-Gestor AB": ["Cobertura AB", "Indicadores AB", "Produção"]
-        }
-
-        indicator = st.selectbox(
-            "Indicador:",
-            indicators_by_source.get(source, ["Geral"])
-        )
-
         region = st.text_input(
             "Código IBGE da Região/Município:",
             value="29",
@@ -301,7 +268,7 @@ elif page == "📊 Explorar Dados":
         with st.spinner("Carregando dados..."):
             # Preparar query
             query = {
-                "indicator": indicator,
+                "dataset_id": selected_dataset_id,
                 "region": region,
                 "start_year": year_start,
                 "end_year": year_end

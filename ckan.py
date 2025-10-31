@@ -11,7 +11,7 @@ import json
 import asyncio
 import logging
 
-from .base import DataConnector
+from base import DataConnector
 
 logger = logging.getLogger(__name__)
 
