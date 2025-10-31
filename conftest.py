@@ -2,13 +2,10 @@ import pytest
 import os
 import sys
 from unittest.mock import patch, MagicMock
-from pytest_cov.embed import cleanup_on_sigterm
+# from pytest_cov.embed import cleanup_on_sigterm
 
 # Configuração para cobertura de testes
-cleanup_on_sigterm()
-
-# Adiciona o diretório raiz ao path para importar os módulos do projeto
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# cleanup_on_sigterm()
 
 # Configuração para os testes
 def pytest_configure(config):

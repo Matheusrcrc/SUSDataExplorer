@@ -18,7 +18,7 @@ try:
 except ImportError:
     logging.warning("PySUS not installed. Install it with 'pip install pysus'")
 
-from .base import DataConnector
+from base import DataConnector
 
 logger = logging.getLogger(__name__)
 
