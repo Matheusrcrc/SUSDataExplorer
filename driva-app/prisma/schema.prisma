@@ -1,0 +1,284 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos de Autenticação e Usuários
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String
+  image         String?
+  role          UserRole  @default(USER)
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relações
+  icpProfiles   ICPProfile[]
+  leads         Lead[]
+  campaigns     ProspectingCampaign[]
+  activities    UserActivity[]
+
+  @@index([organizationId])
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  VIEWER
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  users     User[]
+  icpProfiles ICPProfile[]
+  leads      Lead[]
+  campaigns  ProspectingCampaign[]
+}
+
+// ICP - Ideal Customer Profile
+model ICPProfile {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+
+  // Critérios de segmentação
+  sectors        String[] // CNAEs
+  locations      String[] // Regiões/Estados/Cidades
+  companySizeMin Int?     // Número mínimo de funcionários
+  companySizeMax Int?     // Número máximo de funcionários
+  revenueMin     Float?   // Faturamento mínimo
+  revenueMax     Float?   // Faturamento máximo
+
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relações
+  leads          Lead[]
+
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// Leads/Empresas
+model Lead {
+  id              String    @id @default(cuid())
+
+  // Dados da empresa
+  companyName     String
+  cnpj            String?   @unique
+  cnae            String?
+  sector          String?
+  location        String?
+  city            String?
+  state           String?
+  employees       Int?
+  revenue         Float?
+
+  // Dados de contato
+  email           String?
+  phone           String?
+  whatsapp        String?
+  linkedinUrl     String?
+  website         String?
+
+  // Enriquecimento
+  enriched        Boolean   @default(false)
+  enrichedAt      DateTime?
+
+  // Status e pontuação
+  status          LeadStatus @default(NEW)
+  score           Float?     // Score de qualificação
+
+  // Relacionamentos
+  icpProfileId    String?
+  icpProfile      ICPProfile? @relation(fields: [icpProfileId], references: [id])
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relações
+  interactions    LeadInteraction[]
+  campaignLeads   CampaignLead[]
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([icpProfileId])
+  @@index([status])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+  NURTURING
+}
+
+// Campanhas de Prospecção
+model ProspectingCampaign {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+
+  // Configurações da cadência
+  channels        String[]  // ["EMAIL", "WHATSAPP", "LINKEDIN"]
+  schedule        Json      // Configuração de horários e intervalos
+
+  // Template de mensagens
+  emailTemplate   String?
+  whatsappTemplate String?
+  linkedinTemplate String?
+
+  status          CampaignStatus @default(DRAFT)
+  startDate       DateTime?
+  endDate         DateTime?
+
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relações
+  campaignLeads   CampaignLead[]
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([status])
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+// Relação entre Campanhas e Leads
+model CampaignLead {
+  id         String   @id @default(cuid())
+
+  campaignId String
+  campaign   ProspectingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  leadId     String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  status     String   @default("PENDING") // PENDING, SENT, DELIVERED, OPENED, REPLIED, FAILED
+  lastContactDate DateTime?
+  nextContactDate DateTime?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([campaignId, leadId])
+  @@index([campaignId])
+  @@index([leadId])
+}
+
+// Interações com Leads
+model LeadInteraction {
+  id          String   @id @default(cuid())
+
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  type        InteractionType
+  channel     String   // EMAIL, WHATSAPP, LINKEDIN, PHONE, MEETING
+  subject     String?
+  message     String?
+  response    String?
+
+  sentAt      DateTime @default(now())
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  repliedAt   DateTime?
+
+  createdAt   DateTime @default(now())
+
+  @@index([leadId])
+  @@index([type])
+}
+
+enum InteractionType {
+  OUTBOUND
+  INBOUND
+  AUTOMATED
+  MANUAL
+}
+
+// Atividades do Usuário (para analytics)
+model UserActivity {
+  id          String   @id @default(cuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action      String   // LOGIN, CREATE_LEAD, SEND_EMAIL, etc
+  metadata    Json?    // Dados adicionais da ação
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Dados de Mercado (para mapeamento)
+model MarketData {
+  id          String   @id @default(cuid())
+
+  cnae        String
+  sector      String
+  subsector   String?
+  description String?
+
+  state       String?
+  city        String?
+
+  totalCompanies Int?
+  avgRevenue     Float?
+  avgEmployees   Int?
+
+  // Coordenadas para mapa
+  latitude    Float?
+  longitude   Float?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([cnae])
+  @@index([state])
+  @@index([sector])
+}
